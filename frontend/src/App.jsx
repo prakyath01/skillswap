@@ -29,7 +29,8 @@ function App() {
   // =========================================================
 
   const API_URL =
-    import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+    import.meta.env.VITE_API_URL || "const API_URL =
+  import.meta.env.VITE_API_URL || "https://refactored-dollop-9654qwxgw6v9cx9p9-8000.app.github.dev";
 
   const getToken = () =>
     localStorage.getItem("skillswap_token");
