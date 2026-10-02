@@ -29,7 +29,6 @@ function App() {
   // =========================================================
 
   const API_URL =
-    import.meta.env.VITE_API_URL || "const API_URL =
   import.meta.env.VITE_API_URL || "https://refactored-dollop-9654qwxgw6v9cx9p9-8000.app.github.dev";
 
   const getToken = () =>
