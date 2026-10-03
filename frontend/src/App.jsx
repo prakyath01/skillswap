@@ -29,8 +29,7 @@ function App() {
   // =========================================================
 
   const API_URL =
-  import.meta.env.VITE_API_URL || "https://refactored-dollop-9654qwxgw6v9cx9p9-8000.app.github.dev";
-
+    import.meta.env.VITE_API_URL || "https://refactored-dollop-9654qwxgw6v9cx9p9-8000.app.github.dev";
 
   const getToken = () =>
     localStorage.getItem("skillswap_token");
@@ -82,11 +81,71 @@ function App() {
   // =========================================================
 
   const [skills, setSkills] = useState([]);
-  const [skillSearch, setSkillSearch] = useState("");
+const [skillSearch, setSkillSearch] = useState("");
 
-  const [skillsLoading, setSkillsLoading] = useState(false);
-  const [skillsError, setSkillsError] = useState("");
+const [skillsLoading, setSkillsLoading] = useState(false);
+const [skillsError, setSkillsError] = useState("");
 
+const [newSkillTitle, setNewSkillTitle] = useState("");
+const [newSkillDescription, setNewSkillDescription] = useState("");
+const [newSkillCategory, setNewSkillCategory] = useState("");
+
+const [skillMessage, setSkillMessage] = useState("");
+const [skillCreateError, setSkillCreateError] = useState("");
+const [skillCreateLoading, setSkillCreateLoading] = useState(false);
+
+
+// =========================================================
+// CREATE SKILL - MENTOR
+// =========================================================
+
+const handleCreateSkill = async (event) => {
+  event.preventDefault();
+
+  setSkillMessage("");
+  setSkillCreateError("");
+
+  if (!newSkillTitle.trim()) {
+    setSkillCreateError("Please enter a skill title.");
+    return;
+  }
+
+  setSkillCreateLoading(true);
+
+  try {
+    const response = await axios.post(
+      `${API_URL}/skills`,
+      {
+        title: newSkillTitle.trim(),
+        description: newSkillDescription.trim() || null,
+        category: newSkillCategory.trim() || null,
+      },
+      {
+        headers: authHeaders(),
+      }
+    );
+
+    setSkills((previous) => [
+      ...previous,
+      response.data,
+    ]);
+
+    setNewSkillTitle("");
+    setNewSkillDescription("");
+    setNewSkillCategory("");
+
+    setSkillMessage(
+      "Skill added successfully!"
+    );
+  } catch (error) {
+    setSkillCreateError(
+      error.response?.data?.detail ||
+        "Unable to add skill."
+    );
+  } finally {
+    setSkillCreateLoading(false);
+  }
+};
   // =========================================================
   // BOOKING
   // =========================================================
@@ -1021,6 +1080,162 @@ function App() {
                 link="View Profile"
               />
 
+            </div>
+          </section>
+        )}
+
+        {/* ===================================================
+            MENTOR - MY SKILLS
+        =================================================== */}
+
+        {loggedIn && currentUser?.role === "mentor" && (
+          <section
+            className="signup-section"
+            id="my-skills"
+          >
+            <div className="signup-content">
+              <span>MENTOR DASHBOARD</span>
+
+              <h2>
+                Add Your
+                <strong>{" "}Skills.</strong>
+              </h2>
+
+              <p>
+                Add skills you can teach so students can discover
+                you and book mentoring sessions.
+              </p>
+
+              <form
+                className="signup-form"
+                onSubmit={handleCreateSkill}
+              >
+                <div className="form-group">
+                  <label>Skill Title</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Python Programming"
+                    value={newSkillTitle}
+                    onChange={(event) =>
+                      setNewSkillTitle(event.target.value)
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    placeholder="Describe what you can teach..."
+                    value={newSkillDescription}
+                    onChange={(event) =>
+                      setNewSkillDescription(event.target.value)
+                    }
+                    rows="4"
+                    style={{
+                      width: "100%",
+                      padding: "14px",
+                      background: "#07140a",
+                      color: "#ffffff",
+                      border: "1px solid rgba(65,255,128,0.25)",
+                      borderRadius: "10px",
+                      resize: "vertical",
+                      outline: "none",
+                      fontFamily: "inherit",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Category</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Programming, AI, Design"
+                    value={newSkillCategory}
+                    onChange={(event) =>
+                      setNewSkillCategory(event.target.value)
+                    }
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="primary-button signup-submit"
+                  disabled={skillCreateLoading}
+                >
+                  {skillCreateLoading ? (
+                    "Adding Skill..."
+                  ) : (
+                    <>
+                      Add Skill
+                      <BookOpen size={20} />
+                    </>
+                  )}
+                </button>
+
+                {skillMessage && (
+                  <div className="success-message">
+                    ✓ {skillMessage}
+                  </div>
+                )}
+
+                {skillCreateError && (
+                  <div className="error-message">
+                    {skillCreateError}
+                  </div>
+                )}
+              </form>
+
+              {skills.filter(
+                (skill) => skill.mentor_id === currentUser.id
+              ).length > 0 && (
+                <div
+                  style={{
+                    marginTop: "35px",
+                    textAlign: "left",
+                  }}
+                >
+                  <h3 style={{ marginBottom: "18px" }}>
+                    Your Skills
+                  </h3>
+
+                  {skills
+                    .filter(
+                      (skill) => skill.mentor_id === currentUser.id
+                    )
+                    .map((skill) => (
+                      <div
+                        key={skill.id}
+                        style={{
+                          padding: "16px",
+                          marginBottom: "12px",
+                          border: "1px solid rgba(66,255,131,0.18)",
+                          borderRadius: "10px",
+                          background: "rgba(66,255,131,0.04)",
+                        }}
+                      >
+                        <strong style={{ color: "#42ff83" }}>
+                          {skill.title}
+                        </strong>
+                        <p style={{ margin: "8px 0" }}>
+                          {skill.description ||
+                            "Skill available for mentoring."}
+                        </p>
+                        {skill.category && (
+                          <span
+                            style={{
+                              color: "#42ff83",
+                              fontSize: "12px",
+                            }}
+                          >
+                            {skill.category}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </section>
         )}
