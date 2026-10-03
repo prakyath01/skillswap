@@ -28,8 +28,8 @@ function App() {
   // API
   // =========================================================
 
- const API_URL =
-  import.meta.env.VITE_API_URL || "https://skillswap-9515.onrender.com";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://skillswap-9515.onrender.com";
 
   const getToken = () =>
     localStorage.getItem("skillswap_token");
