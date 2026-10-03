@@ -29,7 +29,8 @@ function App() {
   // =========================================================
 
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://skillswap-9515.onrender.com";
+  import.meta.env.VITE_API_URL || "https://refactored-dollop-9654qwxgw6v9cx9p9-8000.app.github.dev";
+
 
   const getToken = () =>
     localStorage.getItem("skillswap_token");
